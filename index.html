@@ -8,23 +8,21 @@
     <div id="myAwesomeElement"></div> <!--this is where the graph will display. -->
     <div id="cymine"></div>           <!--this is where the graph would display if we didn't specify that myAwesomeElement is the parentElem -->
 
-  <script>
-  var testx = cymine({
-    //optional. Will default to '#cymine' if not specified:
-    parentElem : document.getElementById('myAwesomeElement'),
-    //required. can't query without this! :) must be a valid
-    //intermine API URL
-    service : {root : 'http://www.flymine.org/query/service/'},
-    //required. needs value : "whatever", optionally extraValue : "whatever".
-    queryOn : {
-      "value" : "FBgn0034249"
-    }
-  });
-
-
-
-
-  </script>
+    <script>
+      cymine({
+        //optional. Will default to '#cymine' if not specified:
+        parentElem : document.getElementById('myAwesomeElement'),
+        //required. can't query without this! :) must be a valid
+        //intermine API URL
+        service : {root : 'http://www.flymine.org/query/service/'},
+        //required. needs value : "whatever", optionally extraValue : "whatever".
+        queryOn : {
+          "value" : "FBgn0034249"
+        }
+      }).then(function(hasValues) {
+        //if hasValues is true then the query for interactions returned results
+      });
+    </script>
 
 </body>
 </html>
