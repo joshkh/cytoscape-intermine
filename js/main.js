@@ -5,12 +5,13 @@ _             = require('underscore'),
 strings       = require('./strings'),
 query         = require('./query'),
 cymineDisplay = require('./ui');
+ES6Promise    = require('es6-promise')
 
 function Cymine(args) {
 
   var ui,
   graph = _.extend({},args);
-  init();
+  return init()
 
 /**
  * Checks if there is indeed an element to attach to, and failing that tries a default.
@@ -30,22 +31,22 @@ function Cymine(args) {
     }
     return true;
   }
+
   function validateServiceRoot(){
     if(graph.service){
       return new imjs.Service({
         token: graph.service.token,
         root: graph.service.root,
-        errorHandler : badServiceError
+        errorHandler: badServiceError
       });
     } else {
       throw new initError('noServiceUrl');
       return false;
     }
-
   }
+
   function prepQuery() {
     if(graph.queryOn) {
-      debugger;
       _.extend(query.where[0],graph.queryOn);
       return true;
     } else {
@@ -53,22 +54,27 @@ function Cymine(args) {
       return false;
     }
   }
+
   function init(){
-    if(validateParent()) {
+    return new ES6Promise.Promise(function(resolve, reject) {
+      if(validateParent()) {
       ui = new cymineDisplay(graph);
       var mine = validateServiceRoot();
-      if(prepQuery() && mine) {
-        mine.records(query).then(function(response) {
-          if (response.length > 0) {
-            graph.data = new cymineDataFormatter(response);
-            ui.init();
-            console.debug('response:', response, 'graphdata:', graph);
-          } else {
-            ui.init(strings.user.noResults);
-          }
-        });
+        if(prepQuery() && mine) {
+          mine.records(query).then(function(response) {
+            if (response.length > 0) {
+              graph.data = new cymineDataFormatter(response);
+              ui.init();
+              console.debug('response:', response, 'graphdata:', graph);
+              resolve(true);
+            } else {
+              ui.init(strings.user.noResults);
+              resolve(false);
+            }
+          });
+        }
       }
-    }
+    });
   }
   /**
    * throw this error to console.error and display a user-facing error too
@@ -85,7 +91,8 @@ function Cymine(args) {
  * helper method for calling services from imjs. Useful because we can only pass a reference to a functtion (without args) to imjs, so passing initError wouldn't allow us to set the dev error message.
  * @return {[type]} [description]
  */
-function badServiceError(){
+function badServiceError(err){
+    console.log("error thrown", err);
     throw new initError('badServiceUrl');
 }
 
